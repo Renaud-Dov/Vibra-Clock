@@ -1,0 +1,198 @@
+//////////////////////////////////////////////////////////////////////////
+// Menu
+//////////////////////////////////////////////////////////////////////////
+int Menunb = 0; //Alarme : 0; Date : 1; Heure : 2; Temps_alarme : 3; Langue :4; Temps_Alarme : 5
+int Menumax = 5;
+
+void Menu(){
+  lcd.clear();
+  delay(250);
+        if (Luminositeenb == 0){
+        Luminositeenb = 1;
+        analogWrite(BACKLIGHT_PWM_PIN, 255);}
+  Menu2();
+}
+void Menu_choose(){
+  lcd.setCursor(0,SECOND_LINE);
+  lcd.print("                ");
+  Menu_3();
+       if (Menunb ==0){ //Alarme
+          DEBUG_PRINTLN(" Alarme");
+          lcd.setCursor(5,SECOND_LINE);
+          lcd.print(Alarme[lang]);
+          delay(500); 
+      } else if (Menunb == 1) {//Date
+          DEBUG_PRINTLN(" Date");
+          lcd.setCursor(6,SECOND_LINE);
+          lcd.print(Date[lang]);
+          delay(500); 
+      } else if (Menunb == 2){ //Heure
+          DEBUG_PRINTLN(" Heure");
+          lcd.setCursor(6,SECOND_LINE);
+          lcd.print(Heure[lang]);
+          delay(500);
+      }
+      else if (Menunb == 3){ //Heure
+          DEBUG_PRINTLN("12H/24H");
+          lcd.setCursor(2,SECOND_LINE);
+          lcd.print("12H/24H (");
+          lcd.print(hourFormat);
+          lcd.print(")");
+          delay(500);
+      }
+      else if (Menunb == 4){ //Heure
+          DEBUG_PRINTLN("Langue");
+          lcd.setCursor(5,SECOND_LINE);
+          lcd.print(Langue[lang]);
+          delay(500);
+      }
+            else if (Menunb == 5){ //Heure
+          DEBUG_PRINTLN("Duree_Alarme");
+          lcd.setCursor(2,SECOND_LINE);
+          lcd.print("Duree Alarme");
+          delay(500);
+      }
+      
+}
+void Menu2(){
+    Menu_3();
+    DEBUG_PRINTLN(" Alarme");
+    lcd.setCursor(5,SECOND_LINE);
+    lcd.print(Alarme[lang]);
+    delay(500); 
+      
+Menu_select =  Menunb;
+int get_button_input(Menunb, 0, 0, 10000);
+  previousMillis = millis(); // reset timeout so that the timeout will not occur
+  while (1) { // loop forver
+    if (isTimeout()) { //exit loop if timeout occured
+      lcd.clear();
+      return -1;
+    }
+
+    byte Menu_key = key_press();   // read the buttons
+    switch (Menu_key) {        
+      case btnRIGHT:
+      MenuR();
+      DEBUG_PRINT("Menu_select: ");
+      DEBUG_PRINTLN(Menu_select);
+      Menu_choose();
+        break;
+       
+      case btnLEFT:
+      MenuL();
+      DEBUG_PRINTLN(Menunb);
+      DEBUG_PRINT("Menu_select: ");
+      DEBUG_PRINTLN(Menu_select);
+      Menu_choose();
+        break;
+        
+      case btnSELECT:
+      
+        if (Menunb == 0){ //Alarme
+        DEBUG_PRINTLN("Set Alarm");
+        DEBUG_PRINTLN(Menu_select);
+        DEBUG_PRINTLN(Menunb);
+        lcd.clear();
+        lcd.setCursor(1, FIRST_LINE);
+        lcd.print(Choisir_Alarme[lang]);
+        set_time('A');
+        
+      } else if (Menunb == 1) {//Date
+        lcd.clear();
+        lcd.setCursor(2, FIRST_LINE);
+        lcd.print(Choisir_Date[lang]);
+        set_date();
+      
+      } if (Menunb == 2) { //Heure
+        DEBUG_PRINTLN("Set Time");
+        lcd.clear();
+        lcd.print(Choisir_Heure[lang]);
+        set_time('T'); }
+            
+        if (Menunb == 3) {
+          DEBUG_PRINTLN("14H/24H");
+                byte hh_format;
+      if (hourFormat == 12) {
+        hourFormat = 24;
+      } else {
+        hourFormat = 12;
+      }
+      DEBUG_PRINT("Change to ");
+      DEBUG_PRINT(hourFormat);
+      DEBUG_PRINTLN( " hour format");
+      lcd.clear();
+      lcd.setCursor(3, FIRST_LINE);
+      lcd.print(Change_to[lang]);
+      lcd.setCursor(3, SECOND_LINE);
+      lcd.print(format[lang]);
+      lcd.print(hourFormat);
+      lcd.print("h");
+      delay(2000);
+      lcd.clear(); 
+        }
+      if (Menunb == 4) {
+          DEBUG_PRINTLN("Langue");
+          DEBUG_PRINT("Change to ");
+          DEBUG_PRINT(lang);
+          DEBUG_PRINTLN( " hour format");
+          lcd.clear();     
+            if (lang == 0) {
+              lang = 1;
+              lcd.setCursor(4,FIRST_LINE);
+              lcd.print(Langue[lang]);
+              lcd.setCursor(4, SECOND_LINE); 
+              lcd.print("English");  
+            } else {
+              lang = 0;
+              lcd.setCursor(5,FIRST_LINE);
+              lcd.print(Langue[lang]);
+              lcd.setCursor(4, SECOND_LINE); 
+              lcd.print("Francais");  
+            }
+              delay(2000);
+              lcd.clear(); 
+      }
+      if (Menunb == 5) { //Temps_Alarme
+        DEBUG_PRINTLN("Temps_Alarme");
+        lcd.clear();
+        time_alarm(); }
+      break;
+    }
+    
+    if (Menu_key != btnNONE) { //if a button is pressed
+      previousMillis = millis(); // reset timeout so that the timeout will not occur
+    }
+  }
+Menunb = 0;
+}
+//////////////////////////////////////////////////////////////////////////
+// Interface
+//////////////////////////////////////////////////////////////////////////
+byte Menu_3(){
+    lcd.setCursor(6, FIRST_LINE);
+    lcd.print("Menu");
+    lcd.setCursor(0, SECOND_LINE);
+    lcd.write(byte(0));
+    lcd.setCursor(15, SECOND_LINE);
+    lcd.write(byte(1));
+}
+//////////////////////////////////////////////////////////////////////////
+// Boutons_Interface
+//////////////////////////////////////////////////////////////////////////
+byte MenuR(){
+    if (Menunb  < Menumax){
+      Menunb++;   
+  } else{
+      Menunb = 0;
+ }
+ Menu_select =  Menunb; 
+}
+byte MenuL(){
+    if (Menunb > 0){
+      Menunb--;
+  } else{
+      Menunb = Menumax;
+ }
+ Menu_select =  Menunb; 
+}
