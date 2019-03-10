@@ -1,0 +1,90 @@
+void time_alarm(){
+  lcd.clear();
+  time_alarm_message();
+  lcd.setCursor(9,SECOND_LINE);
+  lcd.print(time_msg);
+  lcd.print(" min");
+menu_time_alarm();
+}
+
+void MenuU_alarm(){
+    if (S < 6){
+      S++;
+  } else{
+      S = 1;
+ }
+}
+void MenuD_alarm(){
+    if (S >1){
+      S--;
+  } else{
+      S = 6;
+ }
+}
+void time_alarm_message(){
+  lcd.print("Choisir duree");
+  lcd.setCursor(0,SECOND_LINE);
+  lcd.print("alarme :");
+}
+
+void time_alarm2(){
+  if (S==1){
+  time_msg=1;  
+  }
+  if (S==2){
+  time_msg=5;  
+  }
+  if (S==3){
+  time_msg=15;  
+  }
+  if (S==4){
+  time_msg=30;  
+  }
+    if (S==5){
+  time_msg=45;  
+  }
+    if (S==6){
+  time_msg=60;  
+  }
+}
+
+void menu_time_alarm(){
+int get_button_input(Menunb, 0, 0, 10000);
+  previousMillis = millis(); // reset timeout so that the timeout will not occur
+  while (1) { // loop forver
+    if (isTimeout()) { //exit loop if timeout occured
+      lcd.clear();
+      return -1;
+    }
+
+    byte Menu_key_alarm = key_press();   // read the buttons
+    switch (Menu_key_alarm) {        
+      case btnDOWN:
+      MenuD_alarm();
+      time_alarm2();
+      time_alarm();
+        break;
+       
+      case btnUP:
+      MenuU_alarm();
+      time_alarm2();
+      time_alarm();
+        break;
+        
+      case btnSELECT:
+      Time =time_msg*10000  ;
+      lcd.clear();
+      lcd.setCursor(1,FIRST_LINE);
+      lcd.print("Duree changee");
+      lcd.setCursor(1,SECOND_LINE);
+      lcd.print("SVP Patientez");
+      Menunb = 0;
+      break;
+
+    
+    if (Menu_key_alarm != btnNONE) { //if a button is pressed
+      previousMillis = millis(); // reset timeout so that the timeout will not occur
+    }
+  }
+ }
+}
